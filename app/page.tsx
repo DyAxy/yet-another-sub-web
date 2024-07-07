@@ -64,12 +64,12 @@ export default function Home() {
 
   const tabs = [
     {
-      id: 'easy',
+      key: 'easy',
       label: '简单模式',
       icon: 'solar:cat-linear',
     },
     {
-      id: 'hard',
+      key: 'hard',
       label: '进阶模式',
       icon: 'solar:winrar-linear'
     },
@@ -157,7 +157,7 @@ export default function Home() {
             }}
           >
             {(item) => (
-              <Tab key={item.id} title={
+              <Tab key={item.key} title={
                 <div className="flex items-center space-x-2 font-bold">
                   <Icon icon={item.icon}></Icon>
                   <span>{item.label}</span>
@@ -258,13 +258,13 @@ export default function Home() {
             value={params.shortSubLink}
             placeholder="生成订阅链接后，点击生成短链"
           />
-          <Textarea
+          {/* <Textarea
             isReadOnly
             variant="bordered"
             label="测试环境"
             className="w-full"
             value={JSON.stringify(params)}
-          />
+          /> */}
           <div
             className="w-2/3 flex flex-col gap-3"
           >
