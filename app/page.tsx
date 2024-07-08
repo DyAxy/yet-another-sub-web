@@ -153,7 +153,7 @@ export default function Home() {
 
   return (
     <div className="w-full p-4 flex flex-col justify-center items-center gap-3">
-      <Card className="w-full lg:w-1/2">
+      <Card className="w-full lg:w-1/2 md:w-2/3">
         <CardBody>
           <Tabs
             size="lg"
@@ -258,7 +258,7 @@ export default function Home() {
                       }}
                       placeholder="节点名排除的关键字，支持正则"
                     />
-                    <div className='flex flex-col sm:grid sm:grid-cols-2 gap-3'>
+                    <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 gap-3'>
                       {config.switchCells.map((cell) => (
                         <SwitchCell
                           key={cell.key}
