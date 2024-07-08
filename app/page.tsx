@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  Autocomplete,
+  AutocompleteItem,
   Button,
   Card,
   CardBody,
@@ -22,8 +24,9 @@ import { config } from '../config'
 
 import { SwitchCell } from "@/components/SwitchCell";
 import { InputCell } from "@/components/InputCell";
-import { AutocompleteCell } from "@/components/AutocompleteCell";
 import { TextCell } from "@/components/TextCell";
+
+const backends = process.env.NEXT_PUBLIC_BACKENDS?.split('|') ?? ["http://127.0.0.1:25500/sub?"]
 
 export default function Home() {
   const { theme, systemTheme, setTheme } = useTheme();
@@ -42,26 +45,6 @@ export default function Home() {
     setTheme(isLightMode ? 'dark' : 'light');
   };
 
-  const [params, setParams] = useState({
-    mode: "easy",
-    subLink: '',
-    shortSubLink: '',
-    shortSubLoading: false,
-
-    backend: process.env.NEXT_PUBLIC_BACKENDS?.split('|')[0] as string,
-    url: '',
-    target: '',
-    config: '',
-    include: '',
-    exclude: '',
-    tfo: false,
-    udp: false,
-    scv: false,
-    append_type: false,
-    emoji: false,
-    list: false
-  })
-
   const tabs = [
     {
       key: 'easy',
@@ -74,24 +57,52 @@ export default function Home() {
       icon: 'solar:winrar-linear'
     },
   ]
+
+  const [params, setParams] = useState({
+    mode: "easy",
+    subLink: '',
+    shortSubLink: '',
+    shortSubLoading: false,
+
+    backend: backends[0],
+    url: '',
+    target: '',
+    config: '',
+    include: '',
+    exclude: '',
+    tfo: false,
+    udp: false,
+    scv: false,
+    append_type: false,
+    emoji: false,
+    list: false
+  })
   const createSub = () => {
-    if (params.url === '') {
+    if (!params.url) {
       return toast.error('请在输入订阅链接后再试')
     }
-    if (params.target === '') {
+    if (!params.target) {
       return toast.error('请在选择客户端后再试')
     }
-    const flow = [params.backend]
-    flow.push(`target=${config.clients[params.target as keyof typeof config.clients]}`)
+    if (!params.backend) {
+      setParams(prevParams => ({ ...prevParams, backend: backends[0] }))
+    }
+    const flow = []
+    const backend = params.backend || backends[0]
+    const targetClient = config.clients[params.target as keyof typeof config.clients]
+
+    flow.push(backend)
+    flow.push(`target=${targetClient}`)
     flow.push(`&url=${encodeURIComponent(params.url.replace(/\n/g, '|'))}`)
     flow.push('&insert=false')
-    if (params.mode == 'hard') {
-      if (params.config !== '') {
-        const item = config.remoteConfig.find(item => item.label === params.config)
-        if (item) flow.push(`&config=${encodeURIComponent(item?.value)}`)
-      }
-      if (params.include !== '') flow.push(`&include=${encodeURIComponent(params.include)}`)
-      if (params.exclude !== '') flow.push(`&exclude=${encodeURIComponent(params.exclude)}`)
+
+    if (params.mode === 'hard') {
+      const configItem = config.remoteConfig.find(item => item.label === params.config);
+      const configValue = configItem ? configItem.value : params.config;
+
+      if (params.config) flow.push(`&config=${encodeURIComponent(configValue)}`)
+      if (params.include) flow.push(`&include=${encodeURIComponent(params.include)}`)
+      if (params.exclude) flow.push(`&exclude=${encodeURIComponent(params.exclude)}`)
       if (params.tfo) flow.push(`&tfo=true`)
       if (params.udp) flow.push(`&udp=true`)
       if (params.scv) flow.push(`&scv=true`)
@@ -99,6 +110,7 @@ export default function Home() {
       if (params.emoji) flow.push(`&emoji=true`)
       if (params.list) flow.push(`&list=true`)
     }
+
     const subLink = flow.join('')
     copy(subLink)
     toast.success('定制订阅已复制到剪贴板')
@@ -106,9 +118,8 @@ export default function Home() {
     setParams(prevParams => ({ ...prevParams, subLink }))
   }
   const createShortSub = async () => {
-    if (params.subLink === '') {
-      return toast.error('请在生成订阅链接后再试')
-    }
+    if (!params.subLink) return toast.error('请在生成订阅链接后再试')
+
     setParams(prevParams => ({ ...prevParams, shortSubLoading: true }));
     try {
       const formData = new FormData();
@@ -133,12 +144,10 @@ export default function Home() {
     }
   };
   const importClash = () => {
-    if (params.subLink === '') {
-      return toast.error('请在生成订阅链接后再试')
-    }
+    if (!params.subLink) return toast.error('请在生成订阅链接后再试')
 
     let url = params.subLink
-    if (params.shortSubLink !== '') url = params.shortSubLink
+    if (params.shortSubLink) url = params.shortSubLink
     window.location.href = `clash://install-config?url=${encodeURIComponent(url)}`
   }
 
@@ -177,42 +186,62 @@ export default function Home() {
                     }}
                   />
                   {/* 客户端 */}
-                  <AutocompleteCell
-                    label="客户端"
+                  <Autocomplete
+                    variant="bordered"
+                    label="软件类型"
+                    placeholder="请选择你使用的客户端类型"
+                    className="w-full"
                     selectedKey={params.target}
                     onSelectionChange={(key) => {
                       setParams({ ...params, target: (key ?? '').toString() });
                     }}
                     defaultItems={Object.entries(config.clients)}
-                    itemKey={0}
-                    itemLabel={0}
-                  />
-                  {params.mode == 'hard' ? (<div className="flex flex-col gap-3">
-                    <AutocompleteCell
+                  >
+                    {((item: any) => (
+                      <AutocompleteItem key={item[0]}>
+                        {item[0]}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
+                  {params.mode === 'hard' ? (<div className="flex flex-col gap-3">
+                    <Autocomplete
+                      variant="bordered"
                       label="后端地址"
-                      selectedKey={params.backend}
-                      onSelectionChange={(key) => {
-                        if (key) {
-                          setParams({ ...params, backend: key.toString() });
-                        }
+                      placeholder="请选择或输入使用的后端地址，留空则为使用默认后端"
+                      className="w-full"
+                      allowsCustomValue
+                      inputValue={params.backend}
+                      onInputChange={(value) => {
+                        setParams({ ...params, backend: value });
                       }}
-                      defaultItems={process.env.NEXT_PUBLIC_BACKENDS?.split('|').map((value, index) => ({
-                        key: index,
+                      defaultItems={backends.map(value => ({
                         value: value
-                      })) as any[]}
-                      itemKey="value"
-                      itemLabel="value"
-                    />
-                    <AutocompleteCell
+                      }))}
+                    >
+                      {((item) => (
+                        <AutocompleteItem key={item.value}>
+                          {item.value}
+                        </AutocompleteItem>
+                      ))}
+                    </Autocomplete>
+                    <Autocomplete
+                      variant="bordered"
                       label="远程配置"
-                      selectedKey={params.config}
-                      onSelectionChange={(key) => {
-                        setParams({ ...params, config: (key ?? '').toString() });
+                      placeholder="请选择或输入需要的远程配置，留空则为不需要远程配置"
+                      className="w-full"
+                      allowsCustomValue
+                      inputValue={params.config}
+                      onInputChange={(value) => {
+                        setParams({ ...params, config: value });
                       }}
                       defaultItems={config.remoteConfig}
-                      itemKey="label"
-                      itemLabel="label"
-                    />
+                    >
+                      {((item: any) => (
+                        <AutocompleteItem key={item.label}>
+                          {item.label}
+                        </AutocompleteItem>
+                      ))}
+                    </Autocomplete>
                     <InputCell
                       label="包含节点"
                       value={params.include}
@@ -229,7 +258,7 @@ export default function Home() {
                       }}
                       placeholder="节点名排除的关键字，支持正则"
                     />
-                    <div className='flex flex-col lg:grid lg:grid-cols-2 gap-3'>
+                    <div className='flex flex-col sm:grid sm:grid-cols-2 gap-3'>
                       {config.switchCells.map((cell) => (
                         <SwitchCell
                           key={cell.key}
@@ -258,13 +287,15 @@ export default function Home() {
             value={params.shortSubLink}
             placeholder="生成订阅链接后，点击生成短链"
           />
-          {/* <Textarea
-            isReadOnly
-            variant="bordered"
-            label="测试环境"
-            className="w-full"
-            value={JSON.stringify(params)}
-          /> */}
+          {process.env.NODE_ENV === 'development' ? (
+            <Textarea
+              isReadOnly
+              variant="bordered"
+              label="测试环境"
+              className="w-full"
+              value={JSON.stringify(params)}
+            />
+          ) : null}
           <div
             className="w-2/3 flex flex-col gap-3"
           >
@@ -297,8 +328,7 @@ export default function Home() {
         >
           <Icon icon={isLightMode ? "solar:sun-2-linear" : "solar:moon-stars-linear"} />
         </Button>
-        Made with ❤ by <Link isExternal
-          href="https://github.com/DyAxy/yet-another-sub-web">DyAxy</Link>.
+        Made with ❤ by <Link isExternal href="https://github.com/DyAxy/yet-another-sub-web">DyAxy</Link>.
       </p>
       <Toaster richColors position="top-center" theme={theme as "light" | "dark" | "system" | undefined} />
     </div >

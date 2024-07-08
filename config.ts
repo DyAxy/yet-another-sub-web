@@ -27,59 +27,34 @@ export const config = {
     ],
     remoteConfig: [
         {
-            label: "No-Urltest",
+            label: "cutethotw 全能规则",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/universal/no-urltest.ini"
+                "https://raw.githubusercontent.com/cutethotw/ClashRule/main/GeneralClashRule.ini"
         },
         {
-            label: "Urltest",
+            label: "ACL4SSR 基础规则",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/universal/urltest.ini"
+                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
         },
         {
-            label: "Maying",
+            label: "ACL4SSR 基础规则 无测速",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/maying.ini"
+                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_NoAuto.ini"
         },
         {
-            label: "Ytoo",
+            label: "ACL4SSR 基础规则 去广告",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/ytoo.ini"
+                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_AdblockPlus.ini"
         },
         {
-            label: "FlowerCloud",
+            label: "ACL4SSR 精简规则",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/flowercloud.ini"
+                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"
         },
         {
-            label: "Nexitally",
+            label: "ACL4SSR 完整规则",
             value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/nexitally.ini"
+                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full.ini"
         },
-        {
-            label: "SoCloud",
-            value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/socloud.ini"
-        },
-        {
-            label: "ARK",
-            value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/ark.ini"
-        },
-        {
-            label: "ssrCloud",
-            value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/customized/ssrcloud.ini"
-        },
-        {
-            label: "NeteaseUnblock(仅规则，No-Urltest)",
-            value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/special/netease.ini"
-        },
-        {
-            label: "Basic(仅GEOIP CN + Final)",
-            value:
-                "https://cdn.jsdelivr.net/gh/SleepyHeeead/subconverter-config@master/remote-config/special/basic.ini"
-        }
     ]
 }
