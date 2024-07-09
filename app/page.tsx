@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -15,8 +15,7 @@ import {
 } from "@nextui-org/react";
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-import { useTheme } from "next-themes";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { encode } from 'js-base64';
 import copy from 'copy-to-clipboard';
 
@@ -25,25 +24,11 @@ import { config } from '../config'
 import { SwitchCell } from "@/components/SwitchCell";
 import { InputCell } from "@/components/InputCell";
 import { TextCell } from "@/components/TextCell";
+import { SwitchTheme } from "@/components/SwitchTheme";
 
 const backends = process.env.NEXT_PUBLIC_BACKENDS?.split('|') ?? ["http://127.0.0.1:25500/sub?"]
 
 export default function Home() {
-  const { theme, systemTheme, setTheme } = useTheme();
-  const isLightMode = useMemo(() => {
-    if (theme === 'system') {
-      return systemTheme === 'light';
-    }
-    return theme === 'light';
-  }, [theme, systemTheme]);
-  useEffect(() => {
-    if (theme !== 'system' && systemTheme === theme) {
-      setTheme('system');
-    }
-  }, [theme, systemTheme, setTheme]);
-  const toggleTheme = () => {
-    setTheme(isLightMode ? 'dark' : 'light');
-  };
 
   const tabs = [
     {
@@ -319,18 +304,9 @@ export default function Home() {
         </CardFooter>
       </Card>
       <p className="text-bold text-sm text-center">
-        <Button
-          isIconOnly
-          size="sm"
-          radius="full"
-          variant="light"
-          onPress={toggleTheme}
-        >
-          <Icon icon={isLightMode ? "solar:sun-2-linear" : "solar:moon-stars-linear"} />
-        </Button>
+        <SwitchTheme />
         Made with ❤ by <Link isExternal href="https://github.com/DyAxy/yet-another-sub-web">DyAxy</Link>.
       </p>
-      <Toaster richColors position="top-center" theme={theme as "light" | "dark" | "system" | undefined} />
     </div >
   );
 }
