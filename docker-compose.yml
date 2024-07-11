@@ -1,0 +1,15 @@
+name: yet-another-sub-web
+
+services:
+  bot:
+    image: moefaq/yet-another-sub-web
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - network
+
+networks:
+  network:
