@@ -1,21 +1,22 @@
-export const config = {
+export const config: CONFIG = {
     clients: {
         Clash: "clash",
-        Surge: "surge&ver=4",
+        ClashR: "clashr",
         Quantumult: "quan",
         QuantumultX: "quanx",
-        Mellow: "mellow",
-        Surfboard: "surfboard",
         Loon: "loon",
-        singbox: "singbox",
+        Mellow: "mellow",
         ss: "ss",
-        ssd: "ssd",
         sssub: "sssub",
+        ssd: "ssd",
         ssr: "ssr",
-        ClashR: "clashr",
-        V2Ray: "v2ray",
+        Surfboard: "surfboard",
+        Surge2: "surge&ver=2",
+        Surge3: "surge&ver=3",
+        Surge4: "surge&ver=4",
         Trojan: "trojan",
-        Surge3: "surge&ver=3"
+        V2Ray: "v2ray",
+        singbox: "singbox",
     },
     switchCells: [
         { title: "TCP 快速打开", key: "tfo" },
@@ -27,34 +28,39 @@ export const config = {
     ],
     remoteConfig: [
         {
-            label: "cutethotw 全能规则",
-            value:
-                "https://raw.githubusercontent.com/cutethotw/ClashRule/main/GeneralClashRule.ini"
-        },
-        {
-            label: "ACL4SSR 基础规则",
-            value:
-                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
-        },
-        {
-            label: "ACL4SSR 基础规则 无测速",
-            value:
-                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_NoAuto.ini"
-        },
-        {
-            label: "ACL4SSR 基础规则 去广告",
-            value:
-                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_AdblockPlus.ini"
-        },
-        {
-            label: "ACL4SSR 精简规则",
-            value:
-                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"
-        },
-        {
-            label: "ACL4SSR 完整规则",
-            value:
-                "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full.ini"
-        },
+            category: '通用规则',
+            items: [
+                {
+                    label: "cutethotw 全能规则",
+                    value:
+                        "https://raw.githubusercontent.com/cutethotw/ClashRule/main/GeneralClashRule.ini"
+                },
+                {
+                    label: "ACL4SSR 基础规则",
+                    value:
+                        "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
+                },
+                {
+                    label: "ACL4SSR 基础规则 无测速",
+                    value:
+                        "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_NoAuto.ini"
+                },
+                {
+                    label: "ACL4SSR 基础规则 去广告",
+                    value:
+                        "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_AdblockPlus.ini"
+                },
+                {
+                    label: "ACL4SSR 精简规则",
+                    value:
+                        "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"
+                },
+                {
+                    label: "ACL4SSR 完整规则",
+                    value:
+                        "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full.ini"
+                },
+            ]
+        }
     ]
 }

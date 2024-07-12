@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Autocomplete,
   AutocompleteItem,
+  AutocompleteSection,
   Button,
   Card,
   CardBody,
@@ -82,8 +83,10 @@ export default function Home() {
     flow.push('&insert=false')
 
     if (params.mode === 'hard') {
-      const configItem = config.remoteConfig.find(item => item.label === params.config);
-      const configValue = configItem ? configItem.value : params.config;
+      const configItem = config.remoteConfig
+        .flatMap(category => category.items)
+        .find(item => item.label === params.config)
+      const configValue = configItem ? configItem.value : params.config
 
       if (params.config) flow.push(`&config=${encodeURIComponent(configValue)}`)
       if (params.include) flow.push(`&include=${encodeURIComponent(params.include)}`)
@@ -182,7 +185,7 @@ export default function Home() {
                     }}
                     defaultItems={Object.entries(config.clients)}
                   >
-                    {((item: any) => (
+                    {(item => (
                       <AutocompleteItem key={item[0]}>
                         {item[0]}
                       </AutocompleteItem>
@@ -203,7 +206,7 @@ export default function Home() {
                         value: value
                       }))}
                     >
-                      {((item) => (
+                      {(item => (
                         <AutocompleteItem key={item.value}>
                           {item.value}
                         </AutocompleteItem>
@@ -221,28 +224,37 @@ export default function Home() {
                       }}
                       defaultItems={config.remoteConfig}
                     >
-                      {((item: any) => (
-                        <AutocompleteItem key={item.label}>
-                          {item.label}
-                        </AutocompleteItem>
+                      {(item => (
+                        <AutocompleteSection
+                          key={item.category}
+                          title={item.category}
+                        >
+                          {item.items.map(url => (
+                            <AutocompleteItem key={url.label}>
+                              {url.label}
+                            </AutocompleteItem>
+                          ))}
+                        </AutocompleteSection>
                       ))}
                     </Autocomplete>
-                    <InputCell
-                      label="包含节点"
-                      value={params.include}
-                      onValueChange={(value) => {
-                        setParams({ ...params, include: value });
-                      }}
-                      placeholder="节点名包含的关键字，支持正则"
-                    />
-                    <InputCell
-                      label="排除节点"
-                      value={params.exclude}
-                      onValueChange={(value) => {
-                        setParams({ ...params, exclude: value });
-                      }}
-                      placeholder="节点名排除的关键字，支持正则"
-                    />
+                    <div className="flex flex-row gap-3">
+                      <InputCell
+                        label="包含节点"
+                        value={params.include}
+                        onValueChange={(value) => {
+                          setParams({ ...params, include: value });
+                        }}
+                        placeholder="节点名包含的关键字，支持正则"
+                      />
+                      <InputCell
+                        label="排除节点"
+                        value={params.exclude}
+                        onValueChange={(value) => {
+                          setParams({ ...params, exclude: value });
+                        }}
+                        placeholder="节点名排除的关键字，支持正则"
+                      />
+                    </div>
                     <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 gap-3'>
                       {config.switchCells.map((cell) => (
                         <SwitchCell
@@ -304,8 +316,7 @@ export default function Home() {
         </CardFooter>
       </Card>
       <p className="text-bold text-sm text-center">
-        <SwitchTheme />
-        Made with ❤ by <Link isExternal href="https://github.com/DyAxy/yet-another-sub-web">DyAxy</Link>.
+        Made with <SwitchTheme /> by <Link isExternal href="https://github.com/DyAxy/yet-another-sub-web">DyAxy</Link>.
       </p>
     </div >
   );

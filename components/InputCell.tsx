@@ -17,5 +17,8 @@ export const InputCell = ({
         value={value}
         onValueChange={onValueChange}
         placeholder={placeholder}
+        classNames={{
+            inputWrapper: 'data-[hover=true]:border-primary/50 group-data-[focus=true]:border-primary/75'
+        }}
     />
 )

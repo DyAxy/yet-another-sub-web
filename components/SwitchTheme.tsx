@@ -38,7 +38,7 @@ export const SwitchTheme = () => {
             variant="light"
             onPress={toggleTheme}
         >
-            <Icon icon={isLightMode ? "solar:sun-2-linear" : "solar:moon-stars-linear"} />
+            <Icon icon={isLightMode ? "solar:heart-linear" : "solar:heart-bold"} />
         </Button>
     )
 }
