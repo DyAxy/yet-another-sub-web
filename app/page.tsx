@@ -228,6 +228,9 @@ export default function Home() {
                         <AutocompleteSection
                           key={item.category}
                           title={item.category}
+                          classNames={{
+                            heading: "flex w-full sticky top-1 z-20 py-1.5 px-2 bg-default-100 shadow-small rounded-small"
+                          }}
                         >
                           {item.items.map(url => (
                             <AutocompleteItem key={url.label}>

@@ -34,29 +34,33 @@ export const config: CONFIG = {
                     label: "cutethotw 全能规则",
                     value:
                         "https://raw.githubusercontent.com/cutethotw/ClashRule/main/GeneralClashRule.ini"
-                },
+                }
+            ]
+        }, {
+            category: "ACL4SSR 规则",
+            items: [
                 {
-                    label: "ACL4SSR 基础规则",
+                    label: "基础规则",
                     value:
                         "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
                 },
                 {
-                    label: "ACL4SSR 基础规则 无测速",
+                    label: "无测速 基础规则",
                     value:
                         "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_NoAuto.ini"
                 },
                 {
-                    label: "ACL4SSR 基础规则 去广告",
+                    label: "去广告 基础规则",
                     value:
                         "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_AdblockPlus.ini"
                 },
                 {
-                    label: "ACL4SSR 精简规则",
+                    label: "精简规则",
                     value:
                         "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"
                 },
                 {
-                    label: "ACL4SSR 完整规则",
+                    label: "完整规则",
                     value:
                         "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full.ini"
                 },

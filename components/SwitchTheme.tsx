@@ -1,35 +1,20 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Button } from "@nextui-org/react";
 import { useTheme } from "next-themes";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 export const SwitchTheme = () => {
     const { theme, systemTheme, setTheme } = useTheme();
-    const [mounted, setMounted] = useState(false)
 
-    const isLightMode = useMemo(() => {
-        if (theme === 'system') {
-            return systemTheme === 'light';
-        }
-        return theme === 'light';
-    }, [theme, systemTheme]);
-    useEffect(() => {
-        if (!mounted && theme !== 'system' && systemTheme === theme) {
-            setTheme('system');
-        }
-    }, [mounted, theme, systemTheme, setTheme]);
+    const isLightMode = useMemo(() => theme === 'system' ? systemTheme === 'light' : theme === 'light', [theme, systemTheme]);
 
     const toggleTheme = () => {
         if (theme === 'system') {
             setTheme(systemTheme === 'light' ? 'dark' : 'light');
         } else {
-            setTheme(isLightMode ? 'dark' : 'light');
+            setTheme(theme !== systemTheme ? 'system' : isLightMode ? 'dark' : 'light');
         }
     };
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
     return (
         <Button
             isIconOnly
