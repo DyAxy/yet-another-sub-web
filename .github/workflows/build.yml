@@ -72,7 +72,7 @@ jobs:
 
       - name: Compress build artifacts
         run: |
-          zip -r ${{ steps.get_version.outputs.asset_name }} build/out
+          zip -r ${{ steps.get_version.outputs.asset_name }} out
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
