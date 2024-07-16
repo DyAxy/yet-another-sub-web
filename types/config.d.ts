@@ -1,4 +1,4 @@
-interface CONFIG {
+interface Config {
     clients: Clients
     switchCells: SwitchCell[]
     remoteConfig: RemoteCategory[]

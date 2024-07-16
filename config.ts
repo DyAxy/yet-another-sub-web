@@ -1,4 +1,4 @@
-export const config: CONFIG = {
+export const config: Config = {
     clients: {
         Clash: "clash",
         ClashR: "clashr",

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['18.x', '20.x']
+        node-version: ["18.x", "20.x"]
 
     steps:
       - name: Checkout actions
@@ -17,9 +17,69 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
+
+      - name: Modify next.config.mjs
+        run: |
+          echo "/** @type {import('next').NextConfig} */
+          const nextConfig = {};
+          nextConfig.output = 'export'
+          export default nextConfig;" > next.config.mjs
 
       - name: Build
         run: |
           npm i
           npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: |
+            out
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout actions
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: Get the current version
+        id: get_version
+        run: |
+          TAG="v$(date +'%Y%m%d%H%M%S')"
+          echo "::set-output name=tag::$TAG"
+          ASSET_NAME="YASW-${TAG}.zip"
+          echo "::set-output name=asset_name::$ASSET_NAME"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          release_name: Release ${{ steps.get_version.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Compress build artifacts
+        run: |
+          zip -r ${{ steps.get_version.outputs.asset_name }} build/out
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.get_version.outputs.asset_name }}
+          asset_name: ${{ steps.get_version.outputs.asset_name }}
+          asset_content_type: application/zip

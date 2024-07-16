@@ -8,7 +8,7 @@
 
 使用 Vercel 服务
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web&env=NEXT_PUBLIC_SHORTURL,NEXT_PUBLIC_BACKENDS&envDescription=%E5%A6%82%E6%9E%9C%E4%B8%8D%E4%BC%9A%E5%A1%AB%E7%82%B9%E5%8F%B3%E8%BE%B9%20%20Learn%20More&envLink=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web%2Fblob%2Fmain%2F.env&project-name=yet-another-sub-web&repository-name=yet-another-sub-web)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web&env=NEXT_PUBLIC_SHORTURL,NEXT_PUBLIC_BACKENDS&envDescription=%E5%A6%82%E6%9E%9C%E4%B8%8D%E4%BC%9A%E5%A1%AB%E7%82%B9%E5%8F%B3%E8%BE%B9%20%20Learn%20More&envLink=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web%2Fblob%2Fmaster%2F.env&project-name=yet-another-sub-web&repository-name=yet-another-sub-web)
 
 本地使用 Docker
 - Docker run方式部署
