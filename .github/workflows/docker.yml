@@ -26,4 +26,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: moefaq/yet-another-sub-web:latest
+          tags: ${{ secrets.DOCKER_USER }}/yet-another-sub-web:latest
