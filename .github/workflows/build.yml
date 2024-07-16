@@ -72,7 +72,8 @@ jobs:
 
       - name: Compress build artifacts
         run: |
-          zip -r ${{ steps.get_version.outputs.asset_name }} out
+          ls build # List contents to debug the actual path
+          zip -r ${{ steps.get_version.outputs.asset_name }} build
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
