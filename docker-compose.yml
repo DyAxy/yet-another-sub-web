@@ -6,6 +6,8 @@ services:
     restart: always
     environment:
       TZ: Asia/Shanghai
+      NEXT_PUBLIC_SHORTURL: https://suo.yt/
+      NEXT_PUBLIC_BACKENDS: http://127.0.0.1:25500/sub?
     ports:
       - "127.0.0.1:3000:3000"
     networks:

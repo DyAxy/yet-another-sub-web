@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { encode } from 'js-base64';
 import copy from 'copy-to-clipboard';
 
-import { config } from '../config'
+import { config as cfg } from '../config'
 
 import { SwitchCell } from "@/components/SwitchCell";
 import { InputCell } from "@/components/InputCell";
@@ -29,8 +29,26 @@ import { SwitchTheme } from "@/components/SwitchTheme";
 
 const backends = process.env.NEXT_PUBLIC_BACKENDS?.split('|') ?? ["http://127.0.0.1:25500/sub?"]
 
-export default function Home() {
+const initialParams = {
+  mode: 'easy',
+  subLink: '',
+  shortSubLink: '',
+  shortSubLoading: false,
+  backend: backends[0],
+  url: '',
+  target: '',
+  config: '',
+  include: '',
+  exclude: '',
+  tfo: false,
+  udp: false,
+  scv: false,
+  append_type: false,
+  emoji: false,
+  list: false,
+};
 
+export default function Home() {
   const tabs = [
     {
       key: 'easy',
@@ -40,63 +58,38 @@ export default function Home() {
     {
       key: 'hard',
       label: '进阶模式',
-      icon: 'solar:winrar-linear'
+      icon: 'solar:winrar-linear',
     },
-  ]
+  ];
 
-  const [params, setParams] = useState({
-    mode: "easy",
-    subLink: '',
-    shortSubLink: '',
-    shortSubLoading: false,
+  const [params, setParams] = useState(initialParams)
 
-    backend: backends[0],
-    url: '',
-    target: '',
-    config: '',
-    include: '',
-    exclude: '',
-    tfo: false,
-    udp: false,
-    scv: false,
-    append_type: false,
-    emoji: false,
-    list: false
-  })
-  const createSub = () => {
-    if (!params.url) {
-      return toast.error('请在输入订阅链接后再试')
-    }
-    if (!params.target) {
-      return toast.error('请在选择客户端后再试')
-    }
-    if (!params.backend) {
-      setParams(prevParams => ({ ...prevParams, backend: backends[0] }))
-    }
-    const flow = []
-    const backend = params.backend || backends[0]
-    const targetClient = config.clients[params.target as keyof typeof config.clients]
+  const createSub = useCallback(() => {
+    const { url, target, backend, mode, config, include, exclude, tfo, udp, scv, append_type, emoji, list } = params;
 
-    flow.push(backend)
-    flow.push(`target=${targetClient}`)
-    flow.push(`&url=${encodeURIComponent(params.url.replace(/\n/g, '|'))}`)
-    flow.push('&insert=false')
+    if (!url) return toast.error('请在输入订阅链接后再试');
+    if (!target) return toast.error('请在选择客户端后再试');
+
+    const flow = [
+      backend || backends[0],
+      `target=${cfg.clients[target as keyof typeof cfg.clients]}`,
+      `&url=${encodeURIComponent(url.replace(/\n/g, '|'))}`,
+      '&insert=false',
+    ];
 
     if (params.mode === 'hard') {
-      const configItem = config.remoteConfig
-        .flatMap(category => category.items)
-        .find(item => item.label === params.config)
-      const configValue = configItem ? configItem.value : params.config
+      const configItem = cfg.remoteConfig.flatMap(category => category.items).find(item => item.label === config);
+      const configValue = configItem ? configItem.value : config;
 
-      if (params.config) flow.push(`&config=${encodeURIComponent(configValue)}`)
-      if (params.include) flow.push(`&include=${encodeURIComponent(params.include)}`)
-      if (params.exclude) flow.push(`&exclude=${encodeURIComponent(params.exclude)}`)
-      if (params.tfo) flow.push(`&tfo=true`)
-      if (params.udp) flow.push(`&udp=true`)
-      if (params.scv) flow.push(`&scv=true`)
-      if (params.append_type) flow.push(`&append_type=true`)
-      if (params.emoji) flow.push(`&emoji=true`)
-      if (params.list) flow.push(`&list=true`)
+      if (config) flow.push(`&config=${encodeURIComponent(configValue)}`);
+      if (include) flow.push(`&include=${encodeURIComponent(include)}`);
+      if (exclude) flow.push(`&exclude=${encodeURIComponent(exclude)}`);
+      if (tfo) flow.push('&tfo=true');
+      if (udp) flow.push('&udp=true');
+      if (scv) flow.push('&scv=true');
+      if (append_type) flow.push('&append_type=true');
+      if (emoji) flow.push('&emoji=true');
+      if (list) flow.push('&list=true');
     }
 
     const subLink = flow.join('')
@@ -104,14 +97,17 @@ export default function Home() {
     toast.success('定制订阅已复制到剪贴板')
 
     setParams(prevParams => ({ ...prevParams, subLink }))
-  }
-  const createShortSub = async () => {
-    if (!params.subLink) return toast.error('请在生成订阅链接后再试')
+  }, [params])
+
+  const createShortSub = useCallback(async () => {
+    const { subLink } = params;
+
+    if (!subLink) return toast.error('请在生成订阅链接后再试');
 
     setParams(prevParams => ({ ...prevParams, shortSubLoading: true }));
     try {
       const formData = new FormData();
-      formData.append('longUrl', encode(params.subLink));
+      formData.append('longUrl', encode(subLink));
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_SHORTURL}short`, {
         method: 'POST',
@@ -121,8 +117,9 @@ export default function Home() {
       if (res.status === 200) {
         const data = await res.json();
         if (data.Code !== 1) throw new Error(data.Message);
-        copy(data.ShortUrl)
-        toast.success('短链接已复制到剪贴板')
+
+        copy(data.ShortUrl);
+        toast.success('短链接已复制到剪贴板');
         setParams(prevParams => ({ ...prevParams, shortSubLink: data.ShortUrl }));
       }
     } catch (e) {
@@ -130,14 +127,16 @@ export default function Home() {
     } finally {
       setParams(prevParams => ({ ...prevParams, shortSubLoading: false }));
     }
-  };
-  const importClash = () => {
-    if (!params.subLink) return toast.error('请在生成订阅链接后再试')
+  }, [params.subLink]);
 
-    let url = params.subLink
-    if (params.shortSubLink) url = params.shortSubLink
-    window.location.href = `clash://install-config?url=${encodeURIComponent(url)}`
-  }
+  const importClash = useCallback(() => {
+    const { subLink, shortSubLink } = params;
+
+    if (!subLink) return toast.error('请在生成订阅链接后再试');
+
+    const url = shortSubLink || subLink;
+    window.location.href = `clash://install-config?url=${encodeURIComponent(url)}`;
+  }, [params]);
 
   return (
     <div className="w-full p-4 flex flex-col justify-center items-center gap-3">
@@ -149,9 +148,7 @@ export default function Home() {
             aria-label="Mode"
             items={tabs}
             selectedKey={params.mode}
-            onSelectionChange={(key) => {
-              setParams({ ...params, mode: key.toString() })
-            }}
+            onSelectionChange={(key) => setParams({ ...params, mode: key.toString() })}
           >
             {(item) => (
               <Tab key={item.key} title={
@@ -169,9 +166,7 @@ export default function Home() {
                     className="w-full"
                     minRows={1}
                     value={params.url}
-                    onValueChange={(value) => {
-                      setParams({ ...params, url: value });
-                    }}
+                    onValueChange={(value) => setParams({ ...params, url: value })}
                   />
                   {/* 客户端 */}
                   <Autocomplete
@@ -180,10 +175,8 @@ export default function Home() {
                     placeholder="请选择你使用的客户端类型"
                     className="w-full"
                     selectedKey={params.target}
-                    onSelectionChange={(key) => {
-                      setParams({ ...params, target: (key ?? '').toString() });
-                    }}
-                    defaultItems={Object.entries(config.clients)}
+                    onSelectionChange={(key) => setParams({ ...params, target: (key ?? '').toString() })}
+                    defaultItems={Object.entries(cfg.clients)}
                   >
                     {(item => (
                       <AutocompleteItem key={item[0]}>
@@ -199,9 +192,7 @@ export default function Home() {
                       className="w-full"
                       allowsCustomValue
                       inputValue={params.backend}
-                      onInputChange={(value) => {
-                        setParams({ ...params, backend: value });
-                      }}
+                      onInputChange={(value) => setParams({ ...params, backend: value })}
                       defaultItems={backends.map(value => ({
                         value: value
                       }))}
@@ -219,10 +210,8 @@ export default function Home() {
                       className="w-full"
                       allowsCustomValue
                       inputValue={params.config}
-                      onInputChange={(value) => {
-                        setParams({ ...params, config: value });
-                      }}
-                      defaultItems={config.remoteConfig}
+                      onInputChange={(value) => setParams({ ...params, config: value })}
+                      defaultItems={cfg.remoteConfig}
                     >
                       {(item => (
                         <AutocompleteSection
@@ -244,29 +233,23 @@ export default function Home() {
                       <InputCell
                         label="包含节点"
                         value={params.include}
-                        onValueChange={(value) => {
-                          setParams({ ...params, include: value });
-                        }}
+                        onValueChange={(value) => setParams({ ...params, include: value })}
                         placeholder="节点名包含的关键字，支持正则"
                       />
                       <InputCell
                         label="排除节点"
                         value={params.exclude}
-                        onValueChange={(value) => {
-                          setParams({ ...params, exclude: value });
-                        }}
+                        onValueChange={(value) => setParams({ ...params, exclude: value })}
                         placeholder="节点名排除的关键字，支持正则"
                       />
                     </div>
                     <div className='flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 gap-3'>
-                      {config.switchCells.map((cell) => (
+                      {cfg.switchCells.map((cell) => (
                         <SwitchCell
                           key={cell.key}
                           title={cell.title}
                           isSelected={params[cell.key as keyof typeof params] as boolean}
-                          onValueChange={(value) => {
-                            setParams({ ...params, [cell.key]: value });
-                          }}
+                          onValueChange={(value) => setParams({ ...params, [cell.key]: value })}
                         />
                       ))}
                     </div>

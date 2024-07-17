@@ -6,21 +6,30 @@
 
 ## 快速部署
 
-使用 Vercel 服务
+### 使用 Vercel 服务
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web&env=NEXT_PUBLIC_SHORTURL,NEXT_PUBLIC_BACKENDS&envDescription=%E5%A6%82%E6%9E%9C%E4%B8%8D%E4%BC%9A%E5%A1%AB%E7%82%B9%E5%8F%B3%E8%BE%B9%20%20Learn%20More&envLink=https%3A%2F%2Fgithub.com%2FDyAxy%2Fyet-another-sub-web%2Fblob%2Fmaster%2F.env&project-name=yet-another-sub-web&repository-name=yet-another-sub-web)
 
-本地使用 Docker
+### 本地使用 Docker
 - Docker run方式部署
 ```
-docker run -d -p 127.0.0.1:3000:3000 --name yet-another-sub-web --restart=always moefaq/yet-another-sub-web:latest
+docker run -d -p 127.0.0.1:3000:3000 --name yet-another-sub-web --restart=always moefaq/yet-another-sub-web:latest -e NEXT_PUBLIC_SHORTURL=https://suo.yt/ -e NEXT_PUBLIC_BACKENDS=http://127.0.0.1:25500/sub?
+# 替换后端或短链接服务
 ```
 
 - Docker compose方式部署
 ```
-# curl -LO https://raw.githubusercontent.com/DyAxy/yet-another-sub-web/master/docker-compose.yml
-# docker compose up -d
+curl -LO https://raw.githubusercontent.com/DyAxy/yet-another-sub-web/master/docker-compose.yml
+# 你可以修改 docker-compose.yml 中的 env
+docker compose up -d
 ```
+
+### 环境变量
+| NEXT_PUBLIC_SHORTURL | NEXT_PUBLIC_BACKENDS        |
+| -------------------- | --------------------------- |
+| 短链接服务，记得带 /   | 后端完整地址                 |
+| https://suo.yt/      | http://127.0.0.1:25500/sub? |
+
 
 ## 常规部署
 
@@ -54,10 +63,15 @@ npm run start
 
 ```
 你的域名.com {
-encode gzip
-reverse_proxy 127.0.0.1:3000
+  encode gzip
+  reverse_proxy 127.0.0.1:3000
 }
 ```
+
+## 静态导出
+
+在常规部署 `npm run dev` 之后，测试没问题的情况下，修改文件：`next.config.mjs`，添加一行：`nextConfig.output = 'export'`
+则会将html及其js文件静态导出至out文件夹，使用 `Caddy`、`nginx` 之类即可使用。
 
 
 ## 感谢
