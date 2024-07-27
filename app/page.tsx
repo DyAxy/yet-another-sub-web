@@ -17,19 +17,20 @@ import {
 import { Icon } from '@iconify/react/dist/iconify.js';
 
 import { toast } from "sonner";
-import { encode } from 'js-base64';
 import copy from 'copy-to-clipboard';
 
-import { config as cfg } from '../config'
+import { config as cfg } from '@/config'
 
-import { SwitchCell } from "@/components/SwitchCell";
-import { InputCell } from "@/components/InputCell";
 import { TextCell } from "@/components/TextCell";
+import { InputCell } from "@/components/InputCell";
+import { SwitchCell } from "@/components/SwitchCell";
 import { SwitchTheme } from "@/components/SwitchTheme";
 
-const backends = process.env.NEXT_PUBLIC_BACKENDS?.split('|') ?? ["http://127.0.0.1:25500/sub?"]
+import { createSub } from "@/app/hooks/createSub";
+import { createShortSub } from "@/app/hooks/createShortSub";
 
-const initialParams = {
+const backends = process.env.NEXT_PUBLIC_BACKENDS?.split('|') ?? ["http://127.0.0.1:25500/sub?"]
+const initialParams: Params = {
   mode: 'easy',
   subLink: '',
   shortSubLink: '',
@@ -64,64 +65,26 @@ export default function Home() {
 
   const [params, setParams] = useState(initialParams)
 
-  const createSub = useCallback(() => {
-    const { url, target, backend, mode, config, include, exclude, tfo, udp, scv, append_type, emoji, list } = params;
+  const createSubscription = useCallback(() => {
+    try {
+      const subLink = createSub(params)
+      copy(subLink)
+      toast.success('定制订阅已复制到剪贴板')
 
-    if (!url) return toast.error('请在输入订阅链接后再试');
-    if (!target) return toast.error('请在选择客户端后再试');
-
-    const flow = [
-      backend || backends[0],
-      `target=${cfg.clients[target as keyof typeof cfg.clients]}`,
-      `&url=${encodeURIComponent(url.replace(/\n/g, '|'))}`,
-      '&insert=false',
-    ];
-
-    if (params.mode === 'hard') {
-      const configItem = cfg.remoteConfig.flatMap(category => category.items).find(item => item.label === config);
-      const configValue = configItem ? configItem.value : config;
-
-      if (config) flow.push(`&config=${encodeURIComponent(configValue)}`);
-      if (include) flow.push(`&include=${encodeURIComponent(include)}`);
-      if (exclude) flow.push(`&exclude=${encodeURIComponent(exclude)}`);
-      if (tfo) flow.push('&tfo=true');
-      if (udp) flow.push('&udp=true');
-      if (scv) flow.push('&scv=true');
-      if (append_type) flow.push('&append_type=true');
-      if (emoji) flow.push('&emoji=true');
-      if (list) flow.push('&list=true');
+      setParams(prevParams => ({ ...prevParams, subLink }))
+    } catch (e) {
+      toast.error((e as Error).message)
     }
-
-    const subLink = flow.join('')
-    copy(subLink)
-    toast.success('定制订阅已复制到剪贴板')
-
-    setParams(prevParams => ({ ...prevParams, subLink }))
   }, [params])
 
-  const createShortSub = useCallback(async () => {
-    const { subLink } = params;
-
-    if (!subLink) return toast.error('请在生成订阅链接后再试');
-
+  const createShortSubscription = useCallback(async () => {
     setParams(prevParams => ({ ...prevParams, shortSubLoading: true }));
     try {
-      const formData = new FormData();
-      formData.append('longUrl', encode(subLink));
+      const shortSubLink = await createShortSub(params.subLink);
+      copy(shortSubLink);
+      toast.success('短链接已复制到剪贴板');
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SHORTURL}short`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.status === 200) {
-        const data = await res.json();
-        if (data.Code !== 1) throw new Error(data.Message);
-
-        copy(data.ShortUrl);
-        toast.success('短链接已复制到剪贴板');
-        setParams(prevParams => ({ ...prevParams, shortSubLink: data.ShortUrl }));
-      }
+      setParams(prevParams => ({ ...prevParams, shortSubLink }));
     } catch (e) {
       toast.error((e as Error).message)
     } finally {
@@ -136,7 +99,7 @@ export default function Home() {
 
     const url = shortSubLink || subLink;
     window.location.href = `clash://install-config?url=${encodeURIComponent(url)}`;
-  }, [params]);
+  }, [params.subLink || params.shortSubLink]);
 
   return (
     <div className="w-full p-4 flex flex-col justify-center items-center gap-3">
@@ -148,7 +111,7 @@ export default function Home() {
             aria-label="Mode"
             items={tabs}
             selectedKey={params.mode}
-            onSelectionChange={(key) => setParams({ ...params, mode: key.toString() })}
+            onSelectionChange={(key) => setParams({ ...params, mode: key.toString() as Params["mode"] })}
           >
             {(item) => (
               <Tab key={item.key} title={
@@ -184,25 +147,25 @@ export default function Home() {
                       </AutocompleteItem>
                     ))}
                   </Autocomplete>
+                  <Autocomplete
+                    variant="bordered"
+                    label="后端地址"
+                    placeholder="请选择或输入使用的后端地址，留空则为使用默认后端"
+                    className="w-full"
+                    allowsCustomValue
+                    inputValue={params.backend}
+                    onInputChange={(value) => setParams({ ...params, backend: value })}
+                    defaultItems={backends.map(value => ({
+                      value: value
+                    }))}
+                  >
+                    {(item => (
+                      <AutocompleteItem key={item.value}>
+                        {item.value}
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
                   {params.mode === 'hard' ? (<div className="flex flex-col gap-3">
-                    <Autocomplete
-                      variant="bordered"
-                      label="后端地址"
-                      placeholder="请选择或输入使用的后端地址，留空则为使用默认后端"
-                      className="w-full"
-                      allowsCustomValue
-                      inputValue={params.backend}
-                      onInputChange={(value) => setParams({ ...params, backend: value })}
-                      defaultItems={backends.map(value => ({
-                        value: value
-                      }))}
-                    >
-                      {(item => (
-                        <AutocompleteItem key={item.value}>
-                          {item.value}
-                        </AutocompleteItem>
-                      ))}
-                    </Autocomplete>
                     <Autocomplete
                       variant="bordered"
                       label="远程配置"
@@ -248,7 +211,7 @@ export default function Home() {
                         <SwitchCell
                           key={cell.key}
                           title={cell.title}
-                          isSelected={params[cell.key as keyof typeof params] as boolean}
+                          isSelected={params[cell.key as keyof Params] as boolean}
                           onValueChange={(value) => setParams({ ...params, [cell.key]: value })}
                         />
                       ))}
@@ -285,13 +248,13 @@ export default function Home() {
             <Button
               color="primary"
               startContent={<Icon icon="solar:link-round-angle-linear" />}
-              onPress={createSub}
+              onPress={createSubscription}
             >生成订阅链接</Button>
             <Button
               isLoading={params.shortSubLoading}
               color="primary"
               startContent={<Icon icon="solar:link-minimalistic-2-linear" />}
-              onPress={createShortSub}
+              onPress={createShortSubscription}
             >生成短链接</Button>
             <Button
               color="default"

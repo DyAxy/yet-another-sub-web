@@ -19,3 +19,21 @@ interface RemoteCategory {
     category: string
     items: RemoteConfigURL[]
 }
+interface Params {
+    mode: 'easy' | 'hard';
+    subLink: string;
+    shortSubLink: string;
+    shortSubLoading: boolean;
+    backend: string;
+    url: string;
+    target: string;
+    config: string;
+    include: string;
+    exclude: string;
+    tfo: boolean;
+    udp: boolean;
+    scv: boolean;
+    append_type: boolean;
+    emoji: boolean;
+    list: boolean;
+};
