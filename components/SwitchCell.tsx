@@ -10,6 +10,7 @@ export const SwitchCell = ({
     onValueChange: (value: boolean) => void
 }) => (
     <Switch
+        color="success"
         classNames={{
             base: cn(
                 "inline-flex flex-row-reverse max-w-full items-center",

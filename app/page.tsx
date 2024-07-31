@@ -121,7 +121,6 @@ export default function Home() {
                 </div>
               }>
                 <div className="flex flex-col gap-3">
-                  {/* 订阅链接 */}
                   <Textarea
                     variant="bordered"
                     label="订阅链接"
@@ -131,7 +130,6 @@ export default function Home() {
                     value={params.url}
                     onValueChange={(value) => setParams({ ...params, url: value })}
                   />
-                  {/* 客户端 */}
                   <Autocomplete
                     variant="bordered"
                     label="软件类型"
@@ -165,6 +163,7 @@ export default function Home() {
                       </AutocompleteItem>
                     ))}
                   </Autocomplete>
+                  {/* 进阶模式 */}
                   {params.mode === 'hard' ? (<div className="flex flex-col gap-3">
                     <Autocomplete
                       variant="bordered"
