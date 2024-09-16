@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.4.2",
+    "@nextui-org/react": "^2.4.8",
     "copy-to-clipboard": "^3.3.3",
     "framer-motion": "^11.3.2",
     "js-base64": "^3.7.7",
